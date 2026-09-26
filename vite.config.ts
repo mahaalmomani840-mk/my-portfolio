@@ -150,7 +150,14 @@ function vitePluginManusDebugCollector(): Plugin {
   };
 }
 
-const plugins = [react(), tailwindcss(), jsxLocPlugin(), vitePluginManusRuntime(), vitePluginManusDebugCollector()];
+const isStaticSite = process.env.VITE_STATIC_SITE === "true";
+const plugins = [
+  react(),
+  tailwindcss(),
+  ...(!isStaticSite
+    ? [jsxLocPlugin(), vitePluginManusRuntime(), vitePluginManusDebugCollector()]
+    : []),
+];
 
 export default defineConfig({
   plugins,

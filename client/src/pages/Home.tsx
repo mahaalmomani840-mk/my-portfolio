@@ -221,7 +221,10 @@ function ProjectDialog({ project, index, onClose }: { project: ProjectRecord | n
 }
 
 function Home() {
-  const publicData = trpc.portfolio.publicData.useQuery();
+  const isStaticSite = import.meta.env.VITE_STATIC_SITE === "true";
+  const publicData = trpc.portfolio.publicData.useQuery(undefined, {
+    enabled: !isStaticSite,
+  });
   const [menuOpen, setMenuOpen] = useState(false);
   const [activeProject, setActiveProject] = useState<ProjectRecord | null>(null);
   const [activeIndex, setActiveIndex] = useState(0);
@@ -229,7 +232,9 @@ function Home() {
   // Set to true only when the protected Studio/database workflow is ready to be used.
   const useDatabaseProjects = false;
   const projects = useDatabaseProjects && publicData.data?.projects?.length ? publicData.data.projects.map(persistedProjectToRecord) : siteConfig.projects;
-  const cvUrl = publicData.data?.settings?.cvUrl ?? siteConfig.person.cvUrl;
+  const cvUrl = isStaticSite
+    ? siteConfig.person.cvUrl
+    : publicData.data?.settings?.cvUrl ?? siteConfig.person.cvUrl;
   const navItems = [
     ["Work", "work"],
     ["Expertise", "expertise"],
